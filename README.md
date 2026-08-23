@@ -93,11 +93,9 @@ coutumier de la discipline :
 
 ## Contenu du dépôt
 
-Ce dépôt documente la traversée du projet par son auteur. Conformément aux
-principes de l'École et à la simple prudence, **il ne contient aucun mot de passe
-de niveau ni aucun code d'exploitation fonctionnel**. Ce qu'il offre, en revanche,
-est un relevé de méthode : des notes sur le raisonnement appliqué, sur les notions
-étudiées, et sur la manière dont chaque classe de vulnérabilité fut abordée.
+Ce dépôt documente la traversée du projet par son auteur. Chaque dossier de niveau
+renferme la source reconstruite, une analyse écrite de la vulnérabilité, et le
+raisonnement par lequel elle fut exploitée.
 
 ## Note d'éthique
 
