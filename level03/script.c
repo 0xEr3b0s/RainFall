@@ -83,3 +83,29 @@
 		0x080484a2 <+34>:	ret
 		0x080484a3 <+35>:	nop
 */
+
+int m = 0; // -> variable globale address probable: 0x0804988c
+
+
+void frame_dummy(void) {
+	return;
+}
+
+void v(void) {
+	char buffer[520];
+#include <stdio.h>
+	fgets(buffer, 512, 0);
+	printf(buffer);
+	if (m == 64) {
+		fwrite("Wait what ?!\n", 1, 12, stdout);
+		#include <stdlib.h>
+		system("/bin/sh");
+	}
+	return ;
+}
+
+int main(void) { // address de debut: 0x804851a
+	v();
+	return 0;
+}
+
