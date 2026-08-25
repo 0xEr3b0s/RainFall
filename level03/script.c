@@ -4,10 +4,25 @@
 	format: elf32-i386
 
 	functions founded:
-		main
-		v -> main call to this function
-		frame_dummy -> potentially a troll function
-		m -> nothing found
+		int m = 0; -> variable globale address probable: 0x0804988c
+
+		main(void) { // address de debut: 0x804851a
+			v();
+			return;
+		}
+
+		v(void) {
+			char buffer[520];
+			fgets(buffer, 512, stdin);
+			printf(buffer);
+			if (m == 64) {
+				fwrite("Wait what ?!\n", 1, 12, stdout);
+				system("/bin/sh");
+			}
+			return;
+		}
+
+		frame_dummy(void) { return; }
 
 ================================================================================
 
