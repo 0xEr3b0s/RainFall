@@ -26,6 +26,15 @@
 
 ================================================================================
 
+find the address of m:
+
+objdump -D level3 | grep <m>
+
+Result:
+0804988c <m>:
+
+================================================================================
+
 Payload pour voir toutes la stack au dela il n'affiche plus d'address:
 
 %p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.
