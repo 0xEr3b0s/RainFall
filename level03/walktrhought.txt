@@ -26,3 +26,5 @@ it shows that it crash specifically at the line of the compare:
 	#2  0x080484da in v ()
 	#3  0x08048525 in main ()
 	(gdb) disas v
+	0x080484da <+54>:    mov    0x804988c,%eax
+   	0x080484df <+59>:    cmp    $0x40,%eax
