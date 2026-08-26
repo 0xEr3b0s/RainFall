@@ -26,12 +26,17 @@
 
 ================================================================================
 
-find the address of m:
+pour trouver m:
 
 objdump -D level3 | grep <m>
 
 Result:
 0804988c <m>:
+
+ou on peut le voir a la ligne de comparaison dans la fonction v:
+
+0x080484da <+54>:    mov    0x804988c,%eax  -> 0x804988c c'est l'address de m
+0x080484df <+59>:    cmp    $0x40,%eax
 
 ================================================================================
 
