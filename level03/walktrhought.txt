@@ -28,3 +28,12 @@ it shows that it crash specifically at the line of the compare:
 	(gdb) disas v
 	0x080484da <+54>:    mov    0x804988c,%eax
    	0x080484df <+59>:    cmp    $0x40,%eax
+
+https://youtu.be/ykMdLCURWFk?is=dr-_eGOBqMqU5wSd -> format string attack
+https://aeb.win.tue.nl/linux/hh/stack-layout.html -> stack explanations
+
+objdump -t level3 -> get all symbols ( allowed me to see that m was global (g) and its addr )
+m is related to the section .bss
+
+addr 	 	flag bit	value	section		alignment or size		name
+0804988c	g     		O		.bss		00000004              	m
