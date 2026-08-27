@@ -1,0 +1,19 @@
+https://man7.org/linux/man-pages/man3/printf.3.html
+
+BUGS         top
+
+       Code such as printf(foo); often indicates a bug, since foo may
+       contain a % character.  If foo comes from untrusted user input, it
+       may contain %n, causing the printf() call to write to memory and
+       creating a security hole.
+
+
+https://cs155.stanford.edu/papers/formatstring-1.2.pdf
+
+D'apres la doc, je peux faire crash le programe:
+
+	3.2 Crash of the program
+
+We can easily trigger some invalid pointer access by just supplying a format string like:
+
+	printf ("%s%s%s%s%s%s%s%s%s%s%s%s");
