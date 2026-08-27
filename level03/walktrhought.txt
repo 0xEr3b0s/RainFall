@@ -37,3 +37,57 @@ m is related to the section .bss
 
 addr 	 	flag bit	value	section		alignment or size		name
 0804988c	g     		O		.bss		00000004              	m
+
+Discover that putting x number of char before %n is writing that number as an int in memory
+
+0 -> 67
+%n -> 68
+"0000000000000000000000000000000000000000000000000000000000000000000%n\n", &m
+
+Program received signal SIGSEGV, Segmentation fault.
+0xb7e7312c in vfprintf () from /lib/i386-linux-gnu/libc.so.6
+(gdb) info registers
+eax            0x200	512
+ecx            0xbffff514	-1073744620
+edx            0xb7e707ea	-1209595926
+ebx            0xb7fd0ff4	-1208152076
+esp            0xbfffef40	0xbfffef40
+ebp            0xbffff4e8	0xbffff4e8
+esi            0xb7fd1a20	-1208149472
+edi            0x44	68							----> Here the 68 correspond to my 0 str
+eip            0xb7e7312c	0xb7e7312c <vfprintf+19020>
+eflags         0x210286	[ PF SF IF RF ID ]
+cs             0x73	115
+ss             0x7b	123
+ds             0x7b	123
+es             0x7b	123
+fs             0x0	0
+gs             0x33	51
+
+
+0 -> 63
+%n -> 64
+"000000000000000000000000000000000000000000000000000000000000000%n\n", &m
+
+Program received signal SIGSEGV, Segmentation fault.
+0xb7e7312c in vfprintf () from /lib/i386-linux-gnu/libc.so.6
+(gdb) info register
+eax            0x200	512
+ecx            0xbffff514	-1073744620
+edx            0xb7e707ea	-1209595926
+ebx            0xb7fd0ff4	-1208152076
+esp            0xbfffef40	0xbfffef40
+ebp            0xbffff4e8	0xbffff4e8
+esi            0xb7fd1a20	-1208149472
+edi            0x40	64                          ----> Here the 64 correspon to my 0 str
+eip            0xb7e7312c	0xb7e7312c <vfprintf+19020>
+eflags         0x210286	[ PF SF IF RF ID ]
+cs             0x73	115
+ss             0x7b	123
+ds             0x7b	123
+es             0x7b	123
+fs             0x0	0
+gs             0x33	51
+
+Now we need to understand how to write that number into m
+
