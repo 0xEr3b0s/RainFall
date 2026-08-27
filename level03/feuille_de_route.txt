@@ -17,3 +17,33 @@ D'apres la doc, je peux faire crash le programe:
 We can easily trigger some invalid pointer access by just supplying a format string like:
 
 	printf ("%s%s%s%s%s%s%s%s%s%s%s%s");
+
+level3@RainFall:~$ ./level3 
+%s%s%s%s%s%s%s%s%s%s%s%s
+Segmentation fault (core dumped)
+
+comme prevus, ca crash.
+
+Ensuite on lis: 
+			‘%n’ parameter, which can be used to write to the addresses on the stack
+			If that is done a few times, it should reliably produce a crash, too.
+
+
+						printf ("%n%n%n%n%n%n%n%n%n%n%n%n");
+On va essayer d'ecrire sur la stack:
+
+level3@RainFall:~$ ./level3 
+%n%n%n%n%n%n%n%n%n%n%n%n
+Segmentation fault (core dumped)
+
+Je me demande ce qui est ecris sur la stack concretement :/
+
+
+	3.3 Viewing the process memory
+		3.3.1 Viewing the stack
+			
+			We can show some parts of the stack memory by using a format string like this:
+					
+					printf ("%08x.%08x.%08x.%08x.%08x\n");
+
+Testons:
