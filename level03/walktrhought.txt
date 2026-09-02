@@ -1,4 +1,5 @@
 https://cs155.stanford.edu/papers/formatstring-1.2.pdf
+https://www.theflash2k.me/blog/ctf-techs/fsb-guide
 
 ==========================================================================================
 
