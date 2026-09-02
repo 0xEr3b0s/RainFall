@@ -1,7 +1,5 @@
 # Rainfall
 
-> Un projet d'exploitation binaire du cursus Cybersécurité de 42.
-
 ## Présentation
 
 **Rainfall** est un exercice dans l'art de l'exploitation logicielle. Il expose
@@ -106,9 +104,6 @@ détient une autorisation explicite. Savoir comment une serrure se crochète rel
 du métier de serrurier ; ce n'est point une licence pour entrer chez autrui.
 
 ---
-
-*Partie intégrante du cursus Cybersécurité de 42 — la chaîne d'exploitation
-binaire.*
 
 # Vm
 Redirection de port obligatoire de vm sur post 4242, 127.0.01:4242 -> IPofVM:4242
