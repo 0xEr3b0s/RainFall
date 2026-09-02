@@ -29,14 +29,14 @@ Disassembly section .text:
      8048471:	8d 85 f8 fd ff ff    	lea    -0x208(%ebp),%eax
      8048477:	89 04 24             	mov    %eax,(%esp)
      804847a:	e8 d1 fe ff ff       	call   8048350 <fgets@plt>      |--> fgets to fill the buffer
-     804847f:	8d 85 f8 fd ff ff    	lea    -0x208(%ebp),%eax
+     804847f:	8d 85 f8 fd ff ff    	lea    -0x208(%ebp),%eax        |--> put ebp-0x208 into eax
      8048485:	89 04 24             	mov    %eax,(%esp)
      8048488:	e8 b7 ff ff ff       	call   8048444 <p>              |--> appelle la fonction <p>
-     804848d:	a1 10 98 04 08       	mov    0x8049810,%eax
-     8048492:	3d 44 55 02 01       	cmp    $0x1025544,%eax
+     804848d:	a1 10 98 04 08       	mov    0x8049810,%eax           |--> move the value of m into eax
+     8048492:	3d 44 55 02 01       	cmp    $0x1025544,%eax          |--> compare the value of m
      8048497:	75 0c                	jne    80484a5 <n+0x4e>
      8048499:	c7 04 24 90 85 04 08 	movl   $0x8048590,(%esp)
-     80484a0:	e8 bb fe ff ff       	call   8048360 <system@plt>
+     80484a0:	e8 bb fe ff ff       	call   8048360 <system@plt>     |--> call to cat
      80484a5:	c9                   	leave
      80484a6:	c3                   	ret
 
@@ -44,7 +44,7 @@ Disassembly section .text:
      080484a7 <main>:
      80484a7:	55                   	push   %ebp
      80484a8:	89 e5                	mov    %esp,%ebp
-     80484aa:	83 e4 f0             	and    $0xfffffff0,%esp
+     80484aa:	83 e4 f0             	and    $0xfffffff0,%esp         |--> verification of esp ?
      80484ad:	e8 a5 ff ff ff       	call   8048457 <n>              |--> appelle de la fonction <n>
      80484b2:	c9                   	leave
      80484b3:	c3                   	ret
@@ -72,3 +72,4 @@ result:
 
 This part of NOP instruction in the main function looks weird could be an attack vector
 
+First idea: we need to put a buffer and use the printf(buffer) to write 0x1025544 into m
