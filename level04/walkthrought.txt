@@ -75,3 +75,10 @@ This part of NOP instruction in the main function looks weird could be an attack
 First idea: we need to put a buffer and use the printf(buffer) to write 0x1025544 into m
 
 The main idea is to get to m and put the good value. For that you need to go from printf ( in p ) to m and write it i need find padding value
+
+After trying the same script as the previous level i got this output
+level4@RainFall:~$ python /tmp/payload.py | ./level4
+AAAA|1=0xb7ff26b0|2=0xbffff794|3=0xb7fd0ff4|4=(nil)|5=(nil)|6=0xbffff758|7=0x804848d|8=0xbffff550|9=0x200|10=0xb7fd1ac0|11=0xb7ff37d0|12=0x41414141|13=0x253d317c|14=0x7c702431|15=0x32253d32
+and clearly saw that my buffer start at the index 12
+Due to stack protection i could not make the same attack (obvi) as previously
+
