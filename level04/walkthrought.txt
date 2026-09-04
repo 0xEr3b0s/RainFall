@@ -44,7 +44,7 @@ Disassembly section .text:
      080484a7 <main>:
      80484a7:	55                   	push   %ebp
      80484a8:	89 e5                	mov    %esp,%ebp
-     80484aa:	83 e4 f0             	and    $0xfffffff0,%esp         |--> verification of esp ?
+     80484aa:	83 e4 f0             	and    $0xfffffff0,%esp         |--> put 0 in esp ?
      80484ad:	e8 a5 ff ff ff       	call   8048457 <n>              |--> appelle de la fonction <n>
      80484b2:	c9                   	leave
      80484b3:	c3                   	ret
@@ -73,3 +73,5 @@ result:
 This part of NOP instruction in the main function looks weird could be an attack vector
 
 First idea: we need to put a buffer and use the printf(buffer) to write 0x1025544 into m
+
+The main idea is to get to m and put the good value. For that you need to go from printf ( in p ) to m and write it i need find padding value
