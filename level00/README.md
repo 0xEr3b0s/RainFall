@@ -11,7 +11,7 @@
 | **Goal user** | `level1` |
 | **Protections** | *(no memory vulnerability at play; logic-based level)* |
 | **Password (level0)** | `level0` |
-| **Password (level1)** | `1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a` |
+| **Password (level1)** | [password.txt](password.txt) |
 
 **Objective:** exploit the `level0` binary (setuid `level1`) so as to obtain a shell and read `/home/user/level1/.pass`.
 
@@ -48,7 +48,7 @@ There is no classical memory vulnerability herein — the matter is one of compr
 
 A reconstruction of the source, for the sake of clarity:
 
-![source.c](source.c)
+[source.c](source.c)
 
 ---
 

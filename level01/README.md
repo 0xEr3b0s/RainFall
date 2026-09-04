@@ -11,7 +11,7 @@
 | **Goal user** | `level2` |
 | **Protections** | *(no canary, no blocking NX at this level)* |
 | **Password (level1)** | `1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a` |
-| **Password (level2)** | `53a4a712787f40ec66c3c26c1f4b164dcad5552b038bb0addd69bf5bf6fa8e77` |
+| **Password (level2)** | [password.txt](password.txt) |
 
 **Objective:** exploit the `level1` binary (setuid `level2`) so as to obtain a shell and read `/home/user/level2/.pass`.
 
@@ -21,7 +21,7 @@
 
 Approximate reconstruction of the source:
 
-![source.c](source.c)
+[source.c](source.c)
 
 The binary reads user input into a fixed buffer, and contains — unused by the ordinary flow of execution — a function that spawns a shell.
 

@@ -11,7 +11,7 @@
 | **Goal user** | `level3` |
 | **Protections** | Stack non-executable (NX); a filter forbidding return addresses within the stack range |
 | **Password (level2)** | `53a4a712787f40ec66c3c26c1f4b164dcad5552b038bb0addd69bf5bf6fa8e77` |
-| **Password (level3)** | `492deb0e7d14c4b5695173cca843c4384fe52d0857c2b0718e1a521a4d33ec02` |
+| **Password (level3)** | [password.txt](password.txt) |
 
 **Objective:** exploit the `level2` binary (setuid `level3`) so as to obtain a shell and read `/home/user/level3/.pass`.
 
@@ -21,7 +21,7 @@
 
 The vulnerable function, here named `p`, receives input by way of `gets()` into a stack buffer, then examines the return address before proceeding further — a precaution which shall prove the level's principal obstacle.
 
-![source.c](source.c)
+[source.c](source.c)
 
 
 ---
