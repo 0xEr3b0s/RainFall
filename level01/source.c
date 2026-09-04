@@ -4,14 +4,14 @@
 
 void run(void)
 {
-    write(1, "Good... oh wait!\n", 17);
-    execl("/bin/sh", "sh", NULL);
+	write(1, "Good... oh wait!\n", 17);
+	execl("/bin/sh", "sh", NULL);
 }
 
 int main(void)
 {
-    char buff[76];
+	char buff[76];
 
-    gets(buff);
-    return 0;
+	gets(buff);
+	return 0;
 }

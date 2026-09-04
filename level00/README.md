@@ -10,8 +10,8 @@
 | **User** | `level0` |
 | **Goal user** | `level1` |
 | **Protections** | *(no memory vulnerability at play; logic-based level)* |
-| **Password (current level)** | `level0` |
-| **Password (obtained)** | `1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a` |
+| **Password (level0)** | `level0` |
+| **Password (level1)** | `1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a` |
 
 **Objective:** exploit the `level0` binary (setuid `level1`) so as to obtain a shell and read `/home/user/level1/.pass`.
 
@@ -48,53 +48,24 @@ There is no classical memory vulnerability herein — the matter is one of compr
 
 A reconstruction of the source, for the sake of clarity:
 
-```c
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-
-int main(int argc, char **argv)
-{
-    if (argc < 2 || atoi(argv[1]) != 423)
-    {
-        fwrite("No !\n", 1, 5, stderr);
-        return 0;
-    }
-
-    char *shell = strdup("/bin/sh");
-
-    gid_t egid = getegid();
-    uid_t euid = geteuid();
-
-    setresgid(egid, egid, egid);
-    setresuid(euid, euid, euid);
-
-    char *args[] = { shell, NULL };
-    execv(shell, args);
-
-    return 0;
-}
-```
+![source.c](source.c)
 
 ---
 
 ## 3. Dynamic Analysis
 
-Superfluous at this level: the condition, once identified through static reading alone, suffices to determine the correct course of action. No breakpoint or runtime observation was required.
+None for this level.
 
 ---
 
 ## 4. Vulnerability
 
-Properly speaking, no vulnerability is present — the level tests one's capacity to read disassembly and grasp a program's logic, rather than any flaw in memory handling.
+No vulnerability just a logic takeover.
 
 ---
 
 ## 5. Exploitation
 
-The strategy consists simply in supplying the value the comparison expects:
 
 ```bash
 ./level0 423

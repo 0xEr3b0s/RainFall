@@ -89,3 +89,7 @@ This means we can't rewrite the program code in ram.
 > The rpath and runpath of an executable or shared library are optional entries in the .dynamic section. They are both a list of directories to search for.
 >
 > rpath designates the run-time search path hard-coded in an executable file or library. Dynamic linking loaders use the rpath to find required libraries.
+
+## Extras
+
+> In the exploit folder of each level you can find a python script that basicaly replay the whole exploit automaticaly.

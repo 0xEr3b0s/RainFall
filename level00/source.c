@@ -6,22 +6,22 @@
 
 int main(int argc, char **argv)
 {
-    if (argc < 2 || atoi(argv[1]) != 423)
-    {
-        fwrite("No !\n", 1, 5, stderr);
-        return 0;
-    }
+	if (argc < 2 || atoi(argv[1]) != 423)
+	{
+		fwrite("No !\n", 1, 5, stderr);
+		return 0;
+	}
 
-    char *shell = strdup("/bin/sh");
+	char *shell = strdup("/bin/sh");
 
-    gid_t egid = getegid();
-    uid_t euid = geteuid();
+	gid_t egid = getegid();
+	uid_t euid = geteuid();
 
-    setresgid(egid, egid, egid);
-    setresuid(euid, euid, euid);
+	setresgid(egid, egid, egid);
+	setresuid(euid, euid, euid);
 
-    char *args[] = { shell, NULL };
-    execv(shell, args);
+	char *args[] = { shell, NULL };
+	execv(shell, args);
 
-    return 0;
+	return 0;
 }
